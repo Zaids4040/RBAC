@@ -39,7 +39,7 @@
     @elseif($currentpanel == 'accounts')
        @livewire('accounts.accounts')
     @elseif($currentpanel == 'emailconfig')
-        @livewire('emain-configure.email-configure')
+        @livewire('email-configure.email-configure')
     @endif
 </main>
 </div>

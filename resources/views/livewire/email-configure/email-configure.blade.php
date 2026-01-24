@@ -21,22 +21,19 @@
                 <table class="w-full">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email Configuration ID</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Configuration Name</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SMTP Host</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SMTP Port</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username/Email</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Encryption</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                             @if(in_array('edit', $currentusrpermissions) || in_array('delete', $currentusrpermissions))
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                             @endif
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach($emailConfigs as $config)
+                        @foreach($email_data as $config)
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{$config->id}}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="ml-4">
@@ -44,25 +41,15 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{$config->smtp_host}}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{$config->smtp_port}}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{$config->host}}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{$config->port}}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{$config->username}}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                        {{$config->encryption}}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($config->is_active)
-                                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Active
-                                        </span>
-                                    @else
-                                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            Inactive
-                                        </span>
-                                    @endif
-                                </td>
+                                
                                 @if(in_array('edit', $currentusrpermissions) || in_array('delete', $currentusrpermissions))
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if(in_array('edit', $currentusrpermissions))
@@ -98,7 +85,6 @@
         @endif
     </div>
 
-
     <!-- Add Email Configuration Modal -->
     @if(in_array('create', $currentusrpermissions) || in_array('edit', $currentusrpermissions))
     <div id="addEmailConfigModal" class="fixed bg-[rgba(0,0,0,0.5)] z-1000 left-0 top-0 w-full h-[100%] justify-center items-center {{ $emailmodal ? 'flex' : 'hidden' }}">
@@ -117,7 +103,7 @@
                     </button>
                 </div>
             </div>
-            <form class="p-6" wire:submit.prevent='saveEmailConfig'>
+            <form class="p-6" wire:submit.prevent='save'>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">Configuration Name *</label>
@@ -170,42 +156,50 @@
                         @error('from_email') <span class="text-red-500">{{ $message }}</span> @enderror
                     </div>
                 </div>
-                @if($emailConfigId == 0)
-                <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div class='w-1/2 mb-2'>
+                    <label class="block text-gray-700 font-semibold mb-2">Test Email</label>
+                    <input type="email" wire:model='test_email' class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="noreply@domain.com">
+                    @error('test_email') <span class="text-red-500">{{ $message }}</span> @enderror
+                </div>
+                <div class="mb-6 p-4  border @if($emailtestmsg == '') border-yellow-200 bg-yellow-50  @elseif($emailtestmsg == 1) border-green-200 bg-green-50 @else border-red-200 bg-red-50  @endif  rounded-lg">
                     <div class="flex items-center">
-                        <i class="fas fa-exclamation-triangle text-yellow-500 mr-3"></i>
+                        @if($emailtestmsg == '') 
+                            <i class="fas fa-exclamation-triangle text-yellow-500 mr-3"></i>
+                        @elseif($emailtestmsg == 1) 
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                        @else 
+                            <i class="fas fa-times-circle text-red-500 mr-3"></i>
+                        @endif
+                        
                         <div>
-                            <h3 class="font-semibold text-yellow-800">Test Before Use</h3>
-                            <p class="text-yellow-700 text-sm">We recommend testing this configuration before setting it as active.</p>
+                            <h3 class="font-semibold @if($emailtestmsg == '') text-yellow-800  @elseif($emailtestmsg == 1) text-green-800 @else text-red-800  @endif ">@if($emailtestmsg == '') Test Before Use  @elseif($emailtestmsg == 1) Email Successfully Send! @else Error  @endif</h3>
+                            <p class="@if($emailtestmsg == '') text-yellow-700  @elseif($emailtestmsg == 1) text-green-700 @else text-red-700  @endif text-sm">@if($emailtestmsg == '') We recommend testing this configuration before setting it as active.  @elseif($emailtestmsg == 1) Check Your Email {{$test_email}} @else {{$emailtestmsg}}  @endif</p>
                         </div>
                     </div>
                 </div>
-                @endif
 
                 <div class="flex justify-end gap-4 pt-4 border-t border-gray-200">
                     <button type="button" wire:click='closeEmailModal' class="px-3 py-2 text-sm md:text-md md:px-6 md:py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-                        <span wire:loading.remove wire:target='closeEmailModal'>Cancel</span>
+                        <span wire:loading.remove wire:target='closeEmailModal'>Close</span>
                         <span wire:loading.flex wire:target="closeEmailModal" class='justify-center'>
                             <svg class="animate-spin h-5 w-5 text-purple" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                             </svg>
                         </span>
-                    </button>
-                    @if($emailConfigId == 0)
-                    <button type="button" wire:click='testEmailConfig' class="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-3 py-2 text-sm md:text-md md:px-8 md:py-3 rounded-lg hover:from-green-700 hover:to-emerald-700 transition shadow-lg">
-                        <i class="fas fa-vial mr-2" wire:loading.remove wire:target='testEmailConfig'></i><span wire:loading.remove wire:target='testEmailConfig'>Test Configuration</span>
-                        <span wire:loading.flex wire:target="testEmailConfig" class='justify-center'>
+                    </button>   
+                    <button type="button" wire:click='testmail' class="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-3 py-2 text-sm md:text-md md:px-8 md:py-3 rounded-lg hover:from-green-700 hover:to-emerald-700 transition shadow-lg">
+                        <i class="fas fa-vial mr-2" wire:loading.remove wire:target='testmail'></i><span wire:loading.remove wire:target='testmail'>Test Configuration</span>
+                        <span wire:loading.flex wire:target="testmail" class='justify-center'>
                             <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                             </svg>
                         </span>
                     </button>
-                    @endif
                     <button type="submit" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-2 text-sm md:text-md md:px-8 md:py-3 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition shadow-lg">
-                        <i class="fas fa-save mr-2" wire:loading.remove wire:target='saveEmailConfig'></i><span wire:loading.remove wire:target='saveEmailConfig'>{{$emailConfigId == 0 ? 'Save Configuration' : 'Update Configuration' }}</span>
-                        <span wire:loading.flex wire:target="saveEmailConfig" class='justify-center'>
+                        <i class="fas fa-save mr-2" wire:loading.remove wire:target='save'></i><span wire:loading.remove wire:target='save'>{{$emailConfigId == 0 ? 'Save Configuration' : 'Update Configuration' }}</span>
+                        <span wire:loading.flex wire:target="save" class='justify-center'>
                             <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>

@@ -18,7 +18,7 @@ class PanelManager extends Component
         'leads'=>['leadspanel','All Submission','fas fa-list-alt'],
         'attendence'=>['attendence','Attendence','fas fa-calendar-check'],
         'accounts'=>['accounts','Accounts','fas fa-calendar-check'],
-        'emailconfig'=>['emailconfig','Email Configuration','fas fa-email']
+        'emailconfig'=>['emailconfig','Email Configuration','fas fa-envelope']
     ];
     public $currentpanel = 'dashboard';
     

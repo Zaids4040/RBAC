@@ -166,6 +166,32 @@ class PermissionSeeder extends Seeder
                     'created_at' => now(),
                     'updated_at' => now(),
                 ],
+
+                [
+                    'module'=>'emailconfig',
+                    'action'=>'create',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'module'=>'emailconfig',
+                    'action'=>'edit',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'module'=>'emailconfig',
+                    'action'=>'delete',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'module'=>'emailconfig',
+                    'action'=>'view',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                
             ]
         );
     }
