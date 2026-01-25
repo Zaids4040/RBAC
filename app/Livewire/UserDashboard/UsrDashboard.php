@@ -7,13 +7,20 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 use App\Models\Package;
 use App\Models\Lead;
+use App\Models\User;
 use App\Models\RolePermissionMap;
 use App\Models\Leadsdocument;
 use App\Models\Attendence;
+use App\Models\Emailsetting;
+use App\Models\Emailconfig;
 use Illuminate\Support\Facades\DB;
-use Exception;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Jobs\SendEmail;
+
 class UsrDashboard extends Component
 {
     use WithFileUploads;
@@ -46,7 +53,7 @@ class UsrDashboard extends Component
     public $totallates;
     public $startDate;
     public $endDate;
-
+    public $emailtxt;
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -55,6 +62,7 @@ class UsrDashboard extends Component
         'emirateid' => 'required|array',
         'emirateid.*' => 'file|mimes:jpg,jpeg,png,pdf|max:15120',
         'package' => 'required|numeric',
+        'emailtxt' => 'required|email'
     ];
     public function openmodal()
     {        
@@ -101,6 +109,7 @@ class UsrDashboard extends Component
     {
         $this->leadmodal = false;
     }
+
     public function save()
     {
         $this->validate();
@@ -112,6 +121,7 @@ class UsrDashboard extends Component
             $leads->phone = $this->phone;
             $leads->locationlink = $this->locationlink;
             $leads->package_id = $this->package;
+            $leads->email = $this->emailtxt;
             $leads->user_id = Auth::user()->id;
             $leads->status = 0;
             $leads->save();
@@ -127,6 +137,7 @@ class UsrDashboard extends Component
                 $document->save();
             }
             DB::commit();
+            SendEmail::dispatch(Auth::user()->name,$this->name,$this->phone);
             $this->reset();
             $this->startDate = now()->subDays(7)->format('Y-m-d');
             $this->endDate   = now()->format('Y-m-d');
@@ -134,7 +145,6 @@ class UsrDashboard extends Component
             $this->view();
             $this->attendence_calculate();
             $this->selectedDaysCount();
-            
         }
         catch(Exception $e)
         {

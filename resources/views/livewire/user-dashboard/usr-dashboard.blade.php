@@ -270,6 +270,12 @@
                     <input type="tel" id="leadNumber" wire:model='phone' required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                     @error('phone')<span class='text-red-500'>{{$message}}</span> @enderror
                 </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-semibold mb-2">Email</label>
+                    <input type="email" id="emailtxt" wire:model='emailtxt' required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    @error('emailtxt')<span class='text-red-500'>{{$message}}</span> @enderror
+                </div>
+                
 
                 <div class="mb-4">
                     <label class="block text-gray-700 font-semibold mb-2">Location</label>

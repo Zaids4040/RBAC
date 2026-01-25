@@ -10,4 +10,8 @@ class Emailsetting extends Model
     {
         return $this->belongsTo(Role::class,'role_id');
     }
+    public function users()
+    {
+        return $this->hasManyThrough(User::class,Role::class,'id','role_id','role_id','id');
+    }
 }
