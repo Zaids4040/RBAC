@@ -1,0 +1,13 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Emailsetting extends Model
+{
+    public function role()
+    {
+        return $this->belongsTo(Role::class,'role_id');
+    }
+}

@@ -10,4 +10,8 @@ class Role extends Model
     {
         return $this->hasMany(User::class, 'role_id');
     }
+    public function emailsettings()
+    {
+        return $this->hasMany(Emailsetting::class,'role_id');
+    }
 }

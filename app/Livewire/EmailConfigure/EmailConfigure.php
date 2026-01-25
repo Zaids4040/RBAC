@@ -4,6 +4,8 @@ namespace App\Livewire\EmailConfigure;
 
 use Livewire\Component;
 use App\Models\Emailconfig;
+use App\Models\Role;
+use App\Models\Emailsetting;
 use App\Models\RolePermissionMap;
 use Illuminate\Support\Facades\Auth;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -26,6 +28,39 @@ class EmailConfigure extends Component
     public $error;
     public $emailmodal = false;
     public $emailtestmsg;
+    public $emailsettingmodal = false;
+    public $roledd;
+    public $emaildd;
+    public $roles = [];
+    public $emails = ['Submission Email','Submission Upgrade Email'];
+    public $email_settins = [];
+    public function openEmailSetupModal()
+    {
+        $this->roles = Role::all();
+        $this->viewemailsettings();
+        $this->emailsettingmodal = true;
+    }
+    public function closeEmailsettingModal()
+    {
+        $this->reset();
+    }
+    public function addemailsetting()
+    {
+        $email = new Emailsetting();
+        $email->role_id = $this->roledd;
+        $email->email_setting = $this->emaildd;
+        $email->save();
+        $this->viewemailsettings();
+    }
+    public function deleteemailsettings($id)
+    {
+        Emailsetting::findOrFail($id)->delete();
+        $this->viewemailsettings();
+    }
+    public function viewemailsettings()
+    {
+        $this->email_settins = Emailsetting::with('role')->get();
+    }
     public function editEmailConfig($id)
     {
         $emailconfig = Emailconfig::findOrFail($id);
@@ -113,6 +148,12 @@ class EmailConfigure extends Component
         {
             $this->error = 'Something went worng';
         }
+        $this->reset();
+    }
+    public function deleteEmailConfig($id)
+    {
+        Emailconfig::findOrFail($id)->delete();
+        $this->view();
     }
    
     public function view()
