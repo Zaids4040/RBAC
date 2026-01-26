@@ -223,7 +223,7 @@ class UsrDashboard extends Component
 
     public function mount()
     {
-        $this->startDate = now()->subDays(7)->format('Y-m-d');
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
 
         $this->cards();

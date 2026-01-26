@@ -12,6 +12,7 @@ use App\Models\RolePermissionMap;
 use App\Models\Leadsdocument;
 use App\Models\Package;
 use Livewire\WithFileUploads;
+use App\Jobs\SendEmail;
 use ZipArchive;
 use Illuminate\Support\Facades\Auth;
 class LeadsPanel extends Component
@@ -92,6 +93,7 @@ class LeadsPanel extends Component
         $lead = Lead::findOrFail($id);
         $lead->note = $this->remarkstxt[$id];
         $lead->save();
+        SendEmail::dispatch(Auth::user()->name,$lead->name,$lead->phone,$lead->status,$this->remarkstxt[$id]);
     }
     public function updateStatus($id, $status)
     {

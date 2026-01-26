@@ -20,15 +20,27 @@ class SendEmail implements ShouldQueue
     public $addedby;
     public $leadname;
     public $leadphone;
+    public $status = 0;
+    public $reason;
     
     /**
      * Create a new job instance.
      */
-    public function __construct($addedby,$leadname,$leadphone,)
+    public function __construct($addedby,$leadname,$leadphone,$status=0,$reason=0)
     {
         $this->addedby = $addedby;
         $this->leadname = $leadname;
         $this->leadphone = $leadphone;
+        $statuses = [
+            0 => 'Submitted',
+            1 => 'In-Process',
+            2 => 'Close',
+            3 => 'Pending',
+            4 => 'Paid',
+        ];
+
+        $this->status = $statuses[$status] ?? 'Reject';
+        $this->reason = $reason;
         
     }
 
@@ -39,9 +51,18 @@ class SendEmail implements ShouldQueue
     {
         $email_config = Emailconfig::first();
 
-        $emailSettings = Emailsetting::where('email_setting', 'Submission Email')
+        if($this->status == 0)
+        {
+            $emailSettings = Emailsetting::where('email_setting', 'Submission Email')
             ->with('users')
             ->get();
+        }
+        else
+        {
+            $emailSettings = Emailsetting::where('email_setting', 'Submission Upgrade Email')
+            ->with('users')
+            ->get();
+        }
 
         $mail = new PHPMailer(true);
 
@@ -67,14 +88,22 @@ class SendEmail implements ShouldQueue
                         $mail->clearAddresses(); // 🔥 IMPORTANT
                         $mail->addAddress($user->email);
 
-                        $mail->Subject = 'New Submission Notification';
+                        $mail->Subject = $this->status == 0 ? 'New Submission Notification' : 'Submission Notification';
 
-                        $mail->Body = '
+                       $mail->Body = '
                             <h3>New Submission</h3>
-                            <p><strong>Added By:</strong> '.$this->addedby.'</p>
-                            <p><strong>Lead Name:</strong> '.$this->leadname.'</p>
-                            <p><strong>Lead Phone:</strong> '.$this->leadphone.'</p>
+
+                            <p><strong>' . ($this->status == 0 ? 'Added By' : 'Updated By') . ':</strong> ' . $this->addedby . '</p>
+
+                            <p><strong>Lead Name:</strong> ' . $this->leadname . '</p>
+
+                            <p><strong>Lead Phone:</strong> ' . $this->leadphone . '</p>
+
+                            <p><strong>Status:</strong> ' . ($this->status == 0 ? 'Submitted' : $this->status) . '</p>
+                            <p><strong>Remarks:</strong> ' . ($this->reason == 0 ? 'NIL' : $this->reason) . '</p>
+
                         ';
+
 
                         $mail->AltBody =
                             'New Submission'."\n".
