@@ -15,6 +15,18 @@ class PermissionSeeder extends Seeder
         Permission::insert(
             [
                 [
+                    'module'=>'admin_dashboard',
+                    'action'=>'Full Access',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'module'=>'user_dashboard',
+                    'action'=>'Full Access',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
                     'module'=>'users',
                     'action'=>'create',
                     'created_at' => now(),
@@ -87,18 +99,6 @@ class PermissionSeeder extends Seeder
                     'updated_at' => now(),
                 ],
                 [
-                    'module'=>'admin_dashboard',
-                    'action'=>'Full Access',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-                [
-                    'module'=>'user_dashboard',
-                    'action'=>'Full Access',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-                [
                     'module'=>'packages',
                     'action'=>'create',
                     'created_at' => now(),
@@ -168,6 +168,31 @@ class PermissionSeeder extends Seeder
                 ],
 
                 [
+                    'module'=>'accounts',
+                    'action'=>'create',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'module'=>'accounts',
+                    'action'=>'edit',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'module'=>'accounts',
+                    'action'=>'delete',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'module'=>'accounts',
+                    'action'=>'view',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+
+                [
                     'module'=>'emailconfig',
                     'action'=>'create',
                     'created_at' => now(),
@@ -191,6 +216,8 @@ class PermissionSeeder extends Seeder
                     'created_at' => now(),
                     'updated_at' => now(),
                 ],
+                
+                
                 
             ]
         );
