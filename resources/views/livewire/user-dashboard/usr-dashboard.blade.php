@@ -144,15 +144,27 @@
                 <h3 class="text-3xl font-bold mt-2">AED <span id="referralCommission">{{$pendingcommission}}</span></h3>
             </div>
 
-            <div class="bg-gradient-to-br from-green-500 to-green-700 rounded-xl shadow-lg p-6 text-white card-hover">
-                <p class="text-green-200 text-sm">Close MRC</p>
-                <h3 class="text-3xl font-bold mt-2">AED <span id="totalCommission">{{$successcommission}}</span></h3>
-            </div>
+            @if(Auth::user()->salary_type != 0)
+                <div class="bg-gradient-to-br from-green-500 to-green-700 rounded-xl shadow-lg p-6 text-white card-hover">
+                    <p class="text-green-200 text-sm">Close MRC</p>
+                    <h3 class="text-3xl font-bold mt-2">AED <span id="totalCommission">{{$successcommission}}</span></h3>
+                </div>
 
-            <div class="bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl shadow-lg p-6 text-white card-hover">
-                <p class="text-teal-200 text-sm">Paid Amount</p>
-                <h3 class="text-3xl font-bold mt-2">AED <span id="paidAmount">{{$paidcommission}}</span></h3>
-            </div>
+                <div class="bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl shadow-lg p-6 text-white card-hover">
+                    <p class="text-teal-200 text-sm">Paid Amount</p>
+                    <h3 class="text-3xl font-bold mt-2">AED <span id="paidAmount">{{$paidcommission}}</span></h3>
+                </div>
+            @else
+                <div class="bg-gradient-to-br from-green-500 to-green-700 rounded-xl shadow-lg p-6 text-white card-hover">
+                    <p class="text-green-200 text-sm">Your Salary</p>
+                    <h3 class="text-3xl font-bold mt-2">AED <span id="totalCommission">{{$usersalary}}</span></h3>
+                </div>
+
+                <div class="bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl shadow-lg p-6 text-white card-hover">
+                    <p class="text-teal-200 text-sm">Your Target</p>
+                    <h3 class="text-3xl font-bold mt-2">AED <span id="paidAmount">{{$usertarget}}</span></h3>
+                </div>
+            @endif
         </div>
         <!-- Attendence Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

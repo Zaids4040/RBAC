@@ -54,6 +54,8 @@ class UsrDashboard extends Component
     public $startDate;
     public $endDate;
     public $emailtxt;
+    public $usersalary;
+    public $usertarget;
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -192,29 +194,68 @@ class UsrDashboard extends Component
         $this->rejected_leads  = (clone $baseQuery)->where('status', 3)->count();
         
         // --- Commission ---
-        $this->totalcommission = (clone $baseQuery)
+        if(Auth::user()->salary_type == 0)
+        {
+            $this->totalcommission = (clone $baseQuery)
+            ->where('status', '!=', 3)
+            ->withSum('package', 'amount')
+            ->get()
+            ->sum('package_sum_amount');
+
+            $this->pendingcommission = (clone $baseQuery)
+            ->where('status', 0)
+            ->withSum('package', 'amount')
+            ->get()
+            ->sum('package_sum_amount');
+
+            $this->usersalary = Auth::user()->salary;
+            $lastlead = Lead::where('user_id', $userId)
+            ->where('status',2)
+            ->latest()
+            ->first();
+           
+                $firstmonthdaterange = Auth::user()->created_at->format('d') - Auth::user()->created_at->copy()->endOfMonth()->format('d');
+                $perdaysalary = $this->usersalary/30;
+                $firstmonthsalary = ceil($perdaysalary*abs($firstmonthdaterange));
+                $noofmonths = ceil(Auth::user()->created_at->diffInMonths(now()));
+                $totalsalary = ((($noofmonths-1)*($this->usersalary))+$firstmonthsalary);
+                $totalcommission = $totalsalary*2;
+
+                $commissionearned = (clone $baseQuery)
+                ->where('status', 2)
+                ->withSum('package', 'amount')
+                ->get()
+                ->sum('package_sum_amount');
+                $this->usertarget = ($totalcommission-$commissionearned);
+           
+
+        }
+        else
+        {
+            $this->totalcommission = (clone $baseQuery)
             ->where('status', '!=', 3)
             ->withSum('package', 'commission')
             ->get()
             ->sum('package_sum_commission');
 
-        $this->pendingcommission = (clone $baseQuery)
+            $this->pendingcommission = (clone $baseQuery)
             ->where('status', 0)
             ->withSum('package', 'commission')
             ->get()
             ->sum('package_sum_commission');
 
-        $this->successcommission = (clone $baseQuery)
-            ->where('status', 1)
-            ->withSum('package', 'commission')
-            ->get()
-            ->sum('package_sum_commission');
-
-        $this->paidcommission = (clone $baseQuery)
+            $this->successcommission = (clone $baseQuery)
             ->where('status', 2)
             ->withSum('package', 'commission')
             ->get()
             ->sum('package_sum_commission');
+
+            $this->paidcommission = (clone $baseQuery)
+                ->where('status', 4)
+                ->withSum('package', 'commission')
+                ->get()
+                ->sum('package_sum_commission');
+        }
 
             $this->view();
             $this->attendence_calculate();
