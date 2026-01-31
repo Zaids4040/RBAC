@@ -166,6 +166,12 @@ class PermissionSeeder extends Seeder
                     'created_at' => now(),
                     'updated_at' => now(),
                 ],
+                [
+                    'module'=>'attendence',
+                    'action'=>'view',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
 
                 [
                     'module'=>'accounts',
