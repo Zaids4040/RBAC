@@ -22,11 +22,12 @@ class SendEmail implements ShouldQueue
     public $leadphone;
     public $status = 0;
     public $reason;
+    public $user_id = 0;
     
     /**
      * Create a new job instance.
      */
-    public function __construct($addedby,$leadname,$leadphone,$status=0,$reason=0)
+    public function __construct($addedby,$leadname,$leadphone,$status=0,$reason=0,$user_id = 0)
     {
         $this->addedby = $addedby;
         $this->leadname = $leadname;
@@ -41,6 +42,7 @@ class SendEmail implements ShouldQueue
 
         $this->status = $statuses[$status] ?? 'Reject';
         $this->reason = $reason;
+        $this->user_id = $user_id;
         
     }
 
@@ -60,8 +62,11 @@ class SendEmail implements ShouldQueue
         else
         {
             $emailSettings = Emailsetting::where('email_setting', 'Submission Upgrade Email')
-            ->with('users')
+            ->with(['users' => function ($q) {
+                $q->where('users.id', $this->user_id);
+            }])
             ->get();
+
         }
 
         $mail = new PHPMailer(true);
